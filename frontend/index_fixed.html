@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Stress Monitor</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-heart"></i> Student Stress Monitor</h1>
+            <p>Understanding your stress levels for better mental health</p>
+        </header>
+
+        <!-- Assessment Form -->
+        <section id="assessment-section" class="section">
+            <div class="form-container">
+                <h2>Stress Level Assessment</h2>
+                <p class="disclaimer">
+                    <i class="fas fa-info-circle"></i>
+                    This assessment is for informational purposes only and should not replace professional medical advice.
+                </p>
+
+                <form id="stress-assessment-form">
+                    <!-- Test with just 3 questions first -->
+                    <div class="form-group">
+                        <label for="anxiety_level">How would you rate your current anxiety level? (0-21)</label>
+                        <input type="range" id="anxiety_level" name="anxiety_level" min="0" max="21" value="10">
+                        <span class="range-value">10</span>
+                        <small>0 = No anxiety, 21 = Severe anxiety</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="self_esteem">How would you rate your self-esteem? (0-30)</label>
+                        <input type="range" id="self_esteem" name="self_esteem" min="0" max="30" value="15">
+                        <span class="range-value">15</span>
+                        <small>0 = Very low, 30 = Very high</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mental_health_history">Do you have a history of mental health issues?</label>
+                        <select id="mental_health_history" name="mental_health_history">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+
+                    <!-- Hidden inputs with default values for other required fields -->
+                    <input type="hidden" name="depression" value="10">
+                    <input type="hidden" name="headache" value="2">
+                    <input type="hidden" name="blood_pressure" value="3">
+                    <input type="hidden" name="sleep_quality" value="3">
+                    <input type="hidden" name="breathing_problem" value="2">
+                    <input type="hidden" name="noise_level" value="3">
+                    <input type="hidden" name="living_conditions" value="3">
+                    <input type="hidden" name="safety" value="4">
+                    <input type="hidden" name="basic_needs" value="4">
+                    <input type="hidden" name="academic_performance" value="3">
+                    <input type="hidden" name="study_load" value="3">
+                    <input type="hidden" name="teacher_student_relationship" value="3">
+                    <input type="hidden" name="future_career_concerns" value="3">
+                    <input type="hidden" name="social_support" value="3">
+                    <input type="hidden" name="peer_pressure" value="3">
+                    <input type="hidden" name="extracurricular_activities" value="2">
+                    <input type="hidden" name="bullying" value="1">
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-chart-line"></i> Analyze My Stress Level
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="section hidden">
+            <div class="results-container">
+                <h2>Your Stress Assessment Results</h2>
+
+                <div id="stress-indicator" class="stress-indicator">
+                    <div class="stress-level-display">
+                        <div class="stress-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stress-info">
+                            <h3 id="stress-label">Loading...</h3>
+                            <p id="stress-confidence">Confidence: 0%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="factors-section">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Key Contributing Factors</h3>
+                    <div id="contributing-factors"></div>
+                </div>
+
+                <div class="recommendations-section">
+                    <h3><i class="fas fa-lightbulb"></i> Personalized Recommendations</h3>
+                    <div id="recommendations"></div>
+                </div>
+
+                <button id="retake-assessment" class="submit-btn">
+                    <i class="fas fa-redo"></i> Retake Assessment
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Analyzing your responses...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Student Stress Monitor Starting...');
+
+        // Simple, bulletproof initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM Content Loaded');
+
+            // Force hide loading overlay immediately
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+                console.log('✅ Loading overlay forcibly hidden');
+            }
+
+            // Initialize range sliders
+            const rangeInputs = document.querySelectorAll('input[type="range"]');
+            rangeInputs.forEach(input => {
+                const valueDisplay = input.nextElementSibling;
+                if (valueDisplay && valueDisplay.classList.contains('range-value')) {
+                    input.addEventListener('input', function() {
+                        valueDisplay.textContent = this.value;
+                    });
+                    valueDisplay.textContent = input.value;
+                }
+            });
+
+            // Form submission
+            const form = document.getElementById('stress-assessment-form');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    console.log('📝 Form submitted');
+
+                    // Show loading
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'flex';
+                        console.log('⏳ Loading overlay shown');
+                    }
+
+                    try {
+                        // Collect form data
+                        const formData = new FormData(form);
+                        const data = {};
+                        for (let [key, value] of formData.entries()) {
+                            data[key] = parseInt(value);
+                        }
+
+                        console.log('📊 Form data:', data);
+
+                        // Send to API
+                        const response = await fetch('http://localhost:5001/predict', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+                        console.log('🎯 API Response:', result);
+
+                        if (response.ok) {
+                            // Update results
+                            document.getElementById('stress-label').textContent = result.stress_label;
+                            document.getElementById('stress-confidence').textContent = `Confidence: ${result.confidence}%`;
+
+                            // Show factors
+                            const factorsDiv = document.getElementById('contributing-factors');
+                            factorsDiv.innerHTML = result.contributing_factors.map(factor =>
+                                `<div class="factor-item">
+                                    <h4>${factor.factor}</h4>
+                                    <p>Level: ${factor.value} | Importance: ${(factor.importance * 100).toFixed(1)}%</p>
+                                </div>`
+                            ).join('');
+
+                            // Show recommendations
+                            const recDiv = document.getElementById('recommendations');
+                            recDiv.innerHTML = result.recommendations.map(rec =>
+                                `<div class="recommendation-item"><p>✅ ${rec}</p></div>`
+                            ).join('');
+
+                            // Show results
+                            document.getElementById('assessment-section').classList.add('hidden');
+                            document.getElementById('results-section').classList.remove('hidden');
+
+                            console.log('✅ Results displayed');
+                        } else {
+                            throw new Error(result.error || 'API request failed');
+                        }
+
+                    } catch (error) {
+                        console.error('❌ Error:', error);
+                        alert('Error: ' + error.message + '\n\nMake sure backend is running on port 5001');
+                    } finally {
+                        // Hide loading
+                        if (loadingOverlay) {
+                            loadingOverlay.style.display = 'none';
+                            console.log('✅ Loading overlay hidden');
+                        }
+                    }
+                });
+                console.log('📋 Form event listener attached');
+            } else {
+                console.error('❌ Form not found!');
+            }
+
+            // Retake button
+            const retakeBtn = document.getElementById('retake-assessment');
+            if (retakeBtn) {
+                retakeBtn.addEventListener('click', function() {
+                    document.getElementById('assessment-section').classList.remove('hidden');
+                    document.getElementById('results-section').classList.add('hidden');
+                    console.log('🔄 Assessment reset');
+                });
+            }
+
+            console.log('🎉 Initialization complete!');
+        });
+    </script>
+</body>
+</html>

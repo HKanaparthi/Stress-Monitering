@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Read(//var/folders/5j/6wjxnm7511q4x4rgtdvt0byh0000gq/T/TemporaryItems/NSIRD_screencaptureui_mRPdDP/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

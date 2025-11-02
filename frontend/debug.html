@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Stress Monitor - Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Student Stress Monitor - Debug Mode</h1>
+
+    <div class="test">
+        <h3>Backend Status</h3>
+        <button onclick="testBackend()">Test Backend Connection</button>
+        <div id="backend-status">Click button to test...</div>
+    </div>
+
+    <div class="test">
+        <h3>Quick Assessment Test</h3>
+        <button onclick="testPrediction()">Test Prediction API</button>
+        <div id="prediction-result">Click button to test...</div>
+    </div>
+
+    <div class="test">
+        <h3>Go to Full Application</h3>
+        <a href="index.html">Open Full Application</a>
+        <p><em>Only use this after both tests above pass</em></p>
+    </div>
+
+    <script>
+        async function testBackend() {
+            const status = document.getElementById('backend-status');
+            status.innerHTML = 'Testing...';
+
+            try {
+                const response = await fetch('http://localhost:5001/health');
+                const data = await response.json();
+
+                if (data.status === 'healthy') {
+                    status.innerHTML = `<span class="success">✅ Backend is working!</span><br>
+                                       Model loaded: ${data.model_loaded}<br>
+                                       Features: ${data.features_count}`;
+                } else {
+                    status.innerHTML = `<span class="error">❌ Backend responded but status is: ${data.status}</span>`;
+                }
+            } catch (error) {
+                status.innerHTML = `<span class="error">❌ Backend connection failed: ${error.message}</span><br>
+                                   Make sure backend is running: <code>cd backend && python app.py</code>`;
+            }
+        }
+
+        async function testPrediction() {
+            const result = document.getElementById('prediction-result');
+            result.innerHTML = 'Testing prediction...';
+
+            const testData = {
+                anxiety_level: 10, self_esteem: 15, mental_health_history: 0, depression: 8,
+                headache: 2, blood_pressure: 2, sleep_quality: 3, breathing_problem: 2,
+                noise_level: 3, living_conditions: 3, safety: 4, basic_needs: 4,
+                academic_performance: 3, study_load: 3, teacher_student_relationship: 3,
+                future_career_concerns: 3, social_support: 3, peer_pressure: 3,
+                extracurricular_activities: 2, bullying: 1
+            };
+
+            try {
+                const response = await fetch('http://localhost:5001/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.innerHTML = `<span class="success">✅ Prediction works!</span><br>
+                                       Stress Level: <strong>${data.stress_label}</strong><br>
+                                       Confidence: ${data.confidence}%<br>
+                                       Recommendations: ${data.recommendations.length} items`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ Prediction failed: ${data.error || 'Unknown error'}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Prediction request failed: ${error.message}</span>`;
+            }
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            testBackend();
+        };
+    </script>
+</body>
+</html>

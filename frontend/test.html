@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .hidden { display: none; }
+        button { padding: 10px 20px; margin: 10px; background: blue; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Quick Loading Test</h1>
+
+    <div id="assessment-section">
+        <h2>Assessment Form</h2>
+        <form id="stress-assessment-form">
+            <p>Quick test form:</p>
+            <input type="range" name="anxiety_level" min="0" max="21" value="10">
+            <button type="submit">Submit Test</button>
+        </form>
+    </div>
+
+    <div id="results-section" class="hidden">
+        <h2>Results</h2>
+        <p>Test results would appear here</p>
+        <button id="retake-assessment">Try Again</button>
+    </div>
+
+    <div id="loading-overlay" class="hidden">
+        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <p>Testing loading...</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('Script starting...');
+
+        // Test the exact same logic
+        let assessmentSection, resultsSection, loadingOverlay, form, retakeBtn;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+
+            assessmentSection = document.getElementById('assessment-section');
+            resultsSection = document.getElementById('results-section');
+            loadingOverlay = document.getElementById('loading-overlay');
+            form = document.getElementById('stress-assessment-form');
+            retakeBtn = document.getElementById('retake-assessment');
+
+            console.log('Elements found:', {
+                assessmentSection: !!assessmentSection,
+                resultsSection: !!resultsSection,
+                loadingOverlay: !!loadingOverlay,
+                form: !!form,
+                retakeBtn: !!retakeBtn
+            });
+
+            // Ensure loading overlay is hidden on startup
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+                console.log('Loading overlay hidden');
+            }
+
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Form submitted');
+
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.remove('hidden');
+                        console.log('Loading overlay shown');
+                    }
+
+                    setTimeout(() => {
+                        if (loadingOverlay) {
+                            loadingOverlay.classList.add('hidden');
+                            console.log('Loading overlay hidden again');
+                        }
+
+                        if (assessmentSection) {
+                            assessmentSection.classList.add('hidden');
+                        }
+                        if (resultsSection) {
+                            resultsSection.classList.remove('hidden');
+                        }
+                    }, 2000);
+                });
+            }
+
+            if (retakeBtn) {
+                retakeBtn.addEventListener('click', function() {
+                    if (assessmentSection) {
+                        assessmentSection.classList.remove('hidden');
+                    }
+                    if (resultsSection) {
+                        resultsSection.classList.add('hidden');
+                    }
+                });
+            }
+
+            console.log('Initialization complete');
+        });
+    </script>
+</body>
+</html>
